@@ -76,9 +76,11 @@ Depends
 ---------------------------------------------------------------------------------------------------
 
 NirCmd - http://www.nirsoft.net/utils/nircmd.html
-NirCmd 2.81 is included in the mega.nz download, but can be downloaded at the URL above if you 
+NirCmd 2.81 is included in the Google Drive download, but can be downloaded at the URL above if you 
 don't want to use included executable (or if you're using the pastebin download). If you download 
 NirCmd from the URL above, simply unzip it into the same directory as this script.
+
+Google drive package: https://drive.google.com/open?id=0B3kHA5NcHrltQnNsUDdtbkNPSTA
 
 
 *****NOTE*****
