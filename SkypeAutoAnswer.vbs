@@ -36,7 +36,7 @@ Set oFSO = CreateObject("Scripting.FileSystemObject")
 '						automatically after a call!
 '               		Options: True, False
 '
-'   - monitorOff: 		Alternative to above, turns monitor off automaticall after a call.
+'   - monitorOff: 		Alternative to above, turns monitor off automatically after a call.
 '						Windows 10 may display lock screen anyway.
 '               		Options: True, False
 
@@ -46,7 +46,7 @@ fullScreen =   		False
 setSysVolume = 		False
 callVolume =   		26
 postCallVolume = 	6
-autoLock = 			False 'Probably shouldn't use this anyway. Will not unlock afterwards!
+autoLock = 			False 'See warning above
 monitorOff = 		False
 
 ' See if we're using 32-bit. If not, bin this instance, and start with the 32-bit WScript
@@ -59,6 +59,7 @@ sPath = WScript.ScriptFullName
 Set oFile = oFSO.GetFile(sPath)
 sFolder = oFSO.GetParentFolderName(oFile) 
 
+'Detect OS bitness, switch to 32-bit interpreter if running on a 64-bit OS
 if Not pArch = "x86" Then
 	sWow64 = ws.ExpandEnvironmentStrings("%windir%") & "\SysWOW64\wscript.exe "
 	i32Bit =  sWow64 & chr(34) & sPath & chr(34)
@@ -69,7 +70,7 @@ End If
 'Runs killall.vbs to terminate all others attached (Skype4COM doesn't detach)
 ws.Run(sFolder & "\killall.vbs")
 
-' Create a Skype API object
+'Create a Skype API object
 Set oSkype = Wscript.CreateObject("Skype4COM.Skype","Skype_")
 
 ' Start the Skype Client and attach
@@ -79,11 +80,12 @@ End If
 
 oSkype.Attach
 
-' Keeps the script running.
+'Keeps the script running.
 Do While True 
 	WScript.Sleep(60000) 
 Loop
 
+'Attach to Skype process
 Public Sub Skype_AttachmentStatus(ByVal aStatus)
 	oSkype.Convert.AttachmentStatusToText(aStatus)
 	If aStatus = oSkype.Convert.TextToAttachmentStatus("AVAILABLE") Then 
@@ -91,6 +93,7 @@ Public Sub Skype_AttachmentStatus(ByVal aStatus)
 	End If
 End Sub
 
+'Sets system volume using NirCmd
 Public Sub SetVol(vol)
 	If setSysVolume = True _
 	Then
@@ -99,6 +102,7 @@ Public Sub SetVol(vol)
 	End If
 End Sub
 
+'The business. This sub is called automatically every time there's a status change in Skype.
 Public Sub Skype_CallStatus(ByRef aCall, ByVal aStatus)
 	Dim oCall, sPartnerName
 	
@@ -112,7 +116,6 @@ Public Sub Skype_CallStatus(ByRef aCall, ByVal aStatus)
 	'DEBUG: displays call status every time it changes. Since it changes pretty often, this will annoy you quickly. Do not uncomment unless you're a tinkerer.
 	'WScript.Echo ">Call " & aCall.Id & " status " & aStatus & " " & oSkype.Convert.CallStatusToText(aStatus)
 	
-	'SetVol(callVolume)
 	SetVol(callVolume)
 	
 	'Get display names of all participants
@@ -157,6 +160,7 @@ Public Sub Skype_CallStatus(ByRef aCall, ByVal aStatus)
 		Or oSkype.Convert.TextToCallType("INCOMING_PSTN") = aCall.Type) _
 	Then
 		'Speak incoming call
+		SetVol(callVolume)
 		ws.Run(sFolder & "\nircmd.exe speak text " & chr(34) & "Incoming call from " & aCall.PartnerDisplayName & chr(34))
 		If autoAnswer = True _
 		Then 
