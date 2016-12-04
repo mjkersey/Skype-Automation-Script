@@ -116,13 +116,6 @@ Public Sub Skype_CallStatus(ByRef aCall, ByVal aStatus)
 	'DEBUG: displays call status every time it changes. Since it changes pretty often, this will annoy you quickly. Do not uncomment unless you're a tinkerer.
 	'WScript.Echo ">Call " & aCall.Id & " status " & aStatus & " " & oSkype.Convert.CallStatusToText(aStatus)
 	
-	SetVol(callVolume)
-	
-	'Get display names of all participants
-	'For Each oCall In oSkype.ActiveCalls
-	'	sPartnerName = sPartnerName & " " & oCall.PartnerDisplayName
-	'Next
-	
 	'On active call, one-time events
 	If aCall.Status = 5 _
 	Then
